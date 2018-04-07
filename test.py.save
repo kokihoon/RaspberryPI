@@ -1,0 +1,60 @@
+import RPi.GPIO as GPIO 
+import time 
+import urllib.parse
+import urllib.request
+
+test_url =  'http://117.16.94.160:8000'
+jinwoo_url = 'http://192.168.0.20:3000/test'
+
+min = 0
+max = 0
+time_count = 0
+GPIO.setmode(GPIO.BOARD)
+print(123)
+pin_to_circuit = 7
+
+def rc_time(pin_to_circuit):
+	count = 0
+	GPIO.setup(pin_to_circuit, GPIO.OUT)
+	GPIO.output(pin_to_circuit, GPIO.LOW)
+
+	time.sleep(0.5)
+
+	GPIO.setup(pin_to_circuit, GPIO.IN)
+
+	while(GPIO.input(pin_to_circuit) == GPIO.LOW):
+		count += 1
+	print(count)
+	#details = urllib.parse.urlencode({'data':count})
+	#details = details.encode('utf-8')
+	#url = urllib.request.Request(test_url, details)
+	#ResponseData = urllib.request.urlopen(url).read().decode('utf-8')
+	
+	#print(ResponseData)
+	time_count +=1
+	print(count,' ', time_count)
+	return count
+
+try:
+	while True:
+		num = rc_time(pin_to_circuit)
+		
+		if (num > max):
+			max = num
+		
+		if (num < min):
+			min = num
+		
+		if(time_count==60):
+			details = urllib.parse.urlencode({'max':max, 'min':min})
+			details = details.encode('utf-8')
+			url = urllib.request.Request(test_url, details)
+			ResponseData = urllib.request.urlopen(url).read().decode('utf-8')
+			time_count=0
+
+
+except KeyboardInterrupt:
+	pass
+finally:
+	GPIO.cleanup()
+
