@@ -37,6 +37,6 @@ def convert(inputName, outputName):
 #            alt = gpgga.antenna_altitude
 #            print(alt)
 
-convert('temp.txt', 'nmea.gpx')
+convert('/home/pi/test3.txt', 'nmea.gpx')
 print ("Done!")
 
