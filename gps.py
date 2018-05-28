@@ -1,13 +1,15 @@
-import time
+import time 
 from time import strftime
+from pynmea import nmea
 
 def dms_to_dec(value, dir):
-    mPos = value.find(".")-2
-
+    mPos = value.find(".")
+    print(mPos)
     degree = float(value[:mPos])
+    print(degree)
     minute = float(value[mPos:])
 
-    converted_degree = float(degree) + float(minute).float(60)
+    converted_degree = float(degree) + float(minute)/float(60)
 
     if dir == "W":
         converted_degree = -converted_degree
@@ -24,16 +26,17 @@ def convert(inputName, outputName):
     file.write("<tk>\n<trkseg>\n")
 
     for line in data:
-        gpgga = line.split(',')
-        if gpgga[0] == '$GPGGA':
-            lat_val = dms_to_dec(gpgga[2], gpgga[3])
-            long_val = dms_to_dec(gpgga[4], gpgga[5])
-            strtrkpt = "<trkpt lat=\""+ str(lat_val) + "\"lon=\""+str(long_val)+"\"> <time>"+format(gpgga[1])+"</time> </trkpt>\n"
+        #gpgga = line.split(',')
+        if line[4] == 'G':
+	    
+            gpgga = nmea.GPGGA()
+            gpgga.parse(line)
+            lats = gpgga.latitude
+            longs = gpgga.longitude
+            print(lats, longs)
+#            alt = gpgga.antenna_altitude
+#            print(alt)
 
-            file.write(strtrkpt)
-
-            file.write("</trkseg>\n</trk>\n<gpx>\n")
-            file.close()
-
-convert('test.txt', 'nmea.gpx')
+convert('temp.txt', 'nmea.gpx')
 print ("Done!")
+
